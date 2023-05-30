@@ -1,34 +1,34 @@
+import express from "express";
+import fs from "fs";
+import path from "path";
+import React from "react";
+import ReactDOMServer from "react-dom/server";
+import { StaticRouter } from "react-router-dom/server";
+import App from "../src/App";
 
-import path from 'path';
-import fs from 'fs';
-
-import React from 'react';
-import ReactDOMServer from 'react-dom/server';
-import express from 'express';
-
-import App from '../src/App';
-
-const PORT = process.env.PORT || 3006;
 const app = express();
 
-app.get('/', (req, res) => {
-  const app =  ReactDOMServer.renderToString(<App />);
-  const indexFile = path.resolve('./build/index.html');
-
-  fs.readFile(indexFile, 'utf8', (err, data) => {
+app.use("^/$", (req, res) => {
+  fs.readFile(path.resolve("./build/index.html"), "utf-8", (err, data) => {
     if (err) {
-      console.error('Something went wrong:', err);
-      return res.status(500).send('Oops, better luck next time!');
+      //console.err(err);
+      return res.status(500).send("Some error happened");
     }
 
+    const html = ReactDOMServer.renderToString(
+      <StaticRouter location={req.url}>
+        <App />
+      </StaticRouter>
+    );
+
     return res.send(
-      data.replace('<div id="root"></div>', `<div id="root">${app}</div>`)
+      data.replace('<div id="root"></div>', `<div id="root">${html}</div>`)
     );
   });
 });
 
-app.use(express.static('./build'));
+app.use(express.static(path.resolve(__dirname, "..", "build")));
 
-app.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}`);
+app.listen(3005, () => {
+  console.log("App is launched");
 });

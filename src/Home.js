@@ -1,5 +1,6 @@
-function Home(props) {
-  return <h1>Hello {props.name}!</h1>;
-};
+import React from "react";
 
+const Home = () => {
+  return <div>Home</div>;
+};
 export default Home;
